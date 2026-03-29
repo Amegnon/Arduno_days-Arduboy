@@ -164,13 +164,13 @@ void launchGame(int gameId) {
     case 1: currentGame = new MorpionGame(&screen); break;
     case 2: currentGame = new TetrisGame(&screen);  break;
     case 3: currentGame = new MazeGame(&screen);    break;
+  } 
 
   if (currentGame != nullptr) {
     currentGame->init();
     consoleState = PLAYING;
   }
 }
-
 // ─────────────────────────────────────────
 //  SETUP
 // ─────────────────────────────────────────
