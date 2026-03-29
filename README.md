@@ -1,117 +1,110 @@
-🎮 Arduboy Custom Console (Arduino)
-📌 Description
+# Arduboy Custom Console (Arduino/ESP32)
 
-Ce projet est une console de jeux portable développée sur Arduino, inspirée du concept de l’Arduboy.
-Elle intègre plusieurs mini-jeux (Snake, Tetris, Morpion, Labyrinthe) avec une interface graphique, un système de menu et une gestion des entrées utilisateur.
+Console de jeux portable DIY inspirée de l'Arduboy, basée sur Arduino/ESP32 et un écran TFT couleur. Le projet propose un mini "moteur" de jeux modulaire avec menu, gestion des entrées, effets sonores et sauvegarde de scores.
 
-👉 L’objectif est de créer un mini moteur de jeu embarqué, capable de lancer plusieurs jeux indépendants via une architecture modulaire.
+## Points forts
+- Menu interactif avec défilement et sélection rapide
+- 4 mini‑jeux intégrés (Snake, Tetris, Morpion, Labyrinthe)
+- Écran d'accueil animé (constellation + barre de chargement)
+- Gestion des entrées (UP, DOWN, LEFT, RIGHT, A, B)
+- Son via buzzer (sons bloquants et non bloquants)
+- Architecture orientée objet (classe `Game` + polymorphisme)
+- Sauvegarde des meilleurs scores via EEPROM
 
-🧠 Fonctionnalités
-🎮 Menu interactif pour sélectionner les jeux
-🕹️ Gestion des boutons (UP, DOWN, LEFT, RIGHT, A, B)
-📺 Affichage via écran TFT (TFT_eSPI)
-🔊 Gestion du son avec buzzer
-🎯 Système de jeux modulaire (polymorphisme avec Game)
-🌌 Écran de démarrage animé (étoiles + barre de chargement)
-⏸️ Pause et Game Over
-💾 Utilisation de l’EEPROM
-🗂️ Structure du projet
-.
-├── LICENSE
-└── main/
-    ├── main.ino       # Programme principal (console + boucle)
-    ├── Game.h         # Classe abstraite des jeux
-    ├── Menu.h         # Gestion du menu
-    ├── Snake.h        # Jeu Snake
-    ├── Tetris.h       # Jeu Tetris
-    ├── Morpion.h      # Jeu Tic-Tac-Toe
-    ├── Maze.h         # Jeu Labyrinthe
-    └── Sound.h        # Gestion du son
-⚙️ Architecture
+## Jeux inclus
+- Snake : mange les pommes, 3 vies, vitesse progressive, hi‑score sauvegardé
+- Tetris : rotation avec `A`/`UP`, accélération avec `DOWN`, hi‑score sauvegardé
+- Morpion : joueur contre IA, curseur clignotant, victoire/défaite/nul
+- Labyrinthe : niveaux procéduraux, chrono et bonus de temps, progression par niveaux
 
-Le projet repose sur une machine à états :
+## Commandes
+- Menu
+- `UP` / `DOWN` : naviguer
+- `A` : lancer le jeu
+- En jeu (général)
+- `B` : pause
+- `A` : reprendre
+- `B` : revenir au menu depuis la pause
+- Contrôles spécifiques
+- Snake : `UP`/`DOWN`/`LEFT`/`RIGHT`
+- Tetris : `LEFT`/`RIGHT` déplacer, `DOWN` accélérer, `A` ou `UP` tourner
+- Morpion : `UP`/`DOWN`/`LEFT`/`RIGHT` déplacer, `A` placer
+- Labyrinthe : `UP`/`DOWN`/`LEFT`/`RIGHT`
 
-enum stateConsole {
-  STARTING,
-  MENU,
-  PLAYING
-};
-🔁 Fonctionnement
-STARTING → écran de démarrage
-MENU → sélection du jeu
-PLAYING → exécution du jeu
-🧩 Système de jeux (Polymorphisme)
+## Matériel recommandé
+- Carte ESP32 (utilisation de `ledcAttach` pour le buzzer)
+- Écran TFT compatible `TFT_eSPI` (résolution 240x135 dans le code)
+- 6 boutons (UP, DOWN, LEFT, RIGHT, A, B)
+- Buzzer passif
+- Alimentation adaptée à la carte et à l'écran
 
-Tous les jeux héritent d’une classe commune :
+## Câblage (pins par défaut)
+Les entrées sont en `INPUT_PULLUP` (boutons actifs à l'état bas).
+- `BTN_UP`  : 25
+- `BTN_DOWN`: 26
+- `BTN_LEFT`: 27
+- `BTN_RIGHT`: 32
+- `BTN_A`   : 13
+- `BTN_B`   : 15
+- `BUZZER_PIN`: 17
+- Pin 4 mise à `HIGH` au démarrage (souvent utilisée pour le backlight TFT, à adapter si besoin)
 
-Game* currentGame;
+Modifie les pins directement dans `main/main.ino` si ton câblage diffère.
 
-Chaque jeu implémente :
+## Dépendances
+- Bibliothèque `TFT_eSPI`
+- Support ESP32 dans l'IDE Arduino
+- `EEPROM` (déjà intégrée à l'IDE Arduino)
 
-update()
-render()
-init()
+### Configuration `TFT_eSPI`
+Pense à configurer le driver et les broches de ton écran dans `TFT_eSPI/User_Setup.h` ou via `User_Setup_Select.h` selon ton installation.
 
-👉 Cela permet de lancer n’importe quel jeu dynamiquement :
-
-currentGame = new SnakeGame(&screen);
-🔌 Matériel utilisé
-Carte Arduino / ESP32
-Écran TFT compatible TFT_eSPI
-Boutons physiques
-Buzzer
-🚀 Installation
+## Installation et compilation
 1. Cloner le projet
+```bash
 git clone https://github.com/Amegnon/Arduno_days-Arduboy.git
 cd Arduno_days-Arduboy/main
-2. Installer les dépendances
+```
+2. Ouvrir `main/main.ino` dans l'IDE Arduino
+3. Installer `TFT_eSPI` via le gestionnaire de bibliothèques
+4. Sélectionner la carte (ex. "ESP32 Dev Module")
+5. Compiler et téléverser
 
-Dans l’IDE Arduino :
+## Architecture du projet
+- `main/main.ino` : boucle principale, machine à états, menu et lancement des jeux
+- `main/Game.h` : classe abstraite + pause + game over + hi‑score
+- `main/Menu.h` : menu graphique et navigation
+- `main/Snake.h` : jeu Snake
+- `main/Tetris.h` : jeu Tetris
+- `main/Morpion.h` : jeu Morpion (IA)
+- `main/Maze.h` : jeu Labyrinthe
+- `main/Sound.h` : gestion des sons
 
-Installer la librairie :
-TFT_eSPI
-3. Configurer le matériel
+## EEPROM
+- Utilisée pour sauvegarder les meilleurs scores
+- Marqueur d'initialisation à l'adresse 10
+- Snake : adresses 0–1
+- Tetris : adresses 6–7
 
-Modifier les pins si nécessaire :
+## Limitations connues
+- Animations et transitions utilisent parfois `delay()`
+- `new`/`delete` pour instancier les jeux (optimisation possible)
+- Mémoire limitée selon la carte utilisée
 
-#define BTN_UP     25
-#define BTN_DOWN   26
-#define BTN_LEFT   27
-#define BTN_RIGHT  32
-#define BTN_A      13
-#define BTN_B      15
-#define BUZZER_PIN 17
-4. Compiler et téléverser
-Ouvrir main.ino
-Sélectionner la carte
-Upload 🚀
-🎮 Jeux disponibles
-Jeu	Description
-🐍 Snake	Mange les pommes et grandis
-❌ Morpion	Jeu à 2 joueurs
-🧱 Tetris	Aligne les lignes
-🧭 Maze	Trouve la sortie
-⚠️ Limitations
-Utilisation de delay() (bloquant)
-Gestion mémoire avec new/delete
-Optimisation possible pour systèmes embarqués
-💡 Améliorations futures
-💾 Sauvegarde des scores
-🎨 Animations plus fluides (sans delay)
-🔋 Optimisation mémoire
-🎮 Ajout de nouveaux jeux
-🌐 Interface web pour gestion des jeux
-📄 Licence
+## Idées d'amélioration
+- Sauvegarde de scores globale et classement
+- Suppression des `delay()` pour un rendu plus fluide
+- Ajout de nouveaux jeux ou modes
+- Menu graphique avec icônes
 
-Ce projet est sous licence MIT.
-Voir le fichier LICENSE.
+## Licence
+Ce projet est sous licence MIT. Voir `LICENSE`.
 
-👨‍💻 Auteurs
-AGNIDE Vital
-ALARA Imdad
-GANDJI Merveille
-HOUNZA Prisca
-KANLINHANON Cadnel
-KPODEGBE Evodie
-SOGADJI Belange
-
+## Auteurs
+- AGNIDE Vital
+- ALARA Imdad
+- GANDJI Merveille
+- HOUNZA Prisca
+- KANLINHANON Cadnel
+- KPODEGBE Evodie
+- SOGADJI Belange
